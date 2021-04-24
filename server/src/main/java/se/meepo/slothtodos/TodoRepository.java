@@ -1,7 +1,7 @@
-package se.meepo.recruitment;
+package se.meepo.slothtodos;
 
 import org.springframework.data.repository.CrudRepository;
-import se.meepo.recruitment.model.Todo;
+import se.meepo.slothtodos.model.Todo;
 
 public interface TodoRepository extends CrudRepository<Todo, Integer> {
 }

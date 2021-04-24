@@ -1,43 +1,43 @@
-package se.meepo.recruitment;
+package se.meepo.slothtodos;
 
 import org.springframework.web.bind.annotation.*;
-import se.meepo.recruitment.model.Member;
+import se.meepo.slothtodos.model.Task;
 
 import javax.inject.Inject;
 
 @RestController
-public class MembersController {
+public class TasksController {
 
     @Inject
-    MembersRepository membersRepository;
+    TaskRepository tasksRepository;
 
     @RequestMapping(
-            value = "members",
+            value = "tasks",
             method = RequestMethod.POST,
             consumes = "application/json"
     )
     @CrossOrigin(origins = "http://localhost:8080")
-    public void post(@RequestBody Member member) {
-        membersRepository.save(member);
+    public void post(@RequestBody Task task) {
+        tasksRepository.save(task);
     }
 
     @RequestMapping(
-            value = "members/{id}",
+            value = "tasks/{id}",
             method = RequestMethod.PUT,
             consumes = "application/json"
     )
     @CrossOrigin(origins = "http://localhost:8080")
-    public void put(@PathVariable int id, @RequestBody Member member) {
-        member.id = id;
-        membersRepository.save(member);
+    public void put(@PathVariable int id, @RequestBody Task task) {
+        task.id = id;
+        tasksRepository.save(task);
     }
 
     @RequestMapping(
-            value = "members/{id}",
+            value = "tasks/{id}",
             method = RequestMethod.DELETE
     )
     @CrossOrigin(origins = "http://localhost:8080")
     public void delete(@PathVariable int id) {
-        membersRepository.deleteById(id);
+        tasksRepository.deleteById(id);
     }
 }

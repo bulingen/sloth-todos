@@ -1,4 +1,4 @@
-package se.meepo.recruitment;
+package se.meepo.slothtodos;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

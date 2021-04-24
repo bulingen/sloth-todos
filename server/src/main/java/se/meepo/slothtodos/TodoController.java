@@ -7,6 +7,8 @@ import se.meepo.slothtodos.model.Todo;
 import se.meepo.slothtodos.model.Task;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
+
 import java.util.List;
 
 @RestController
@@ -33,7 +35,7 @@ public class TodoController {
             consumes = "application/json"
     )
     @CrossOrigin(origins = "http://localhost:8080")
-    public void post(@RequestBody Todo todo) {
+    public void post(@Valid @RequestBody Todo todo) {
         todoRepository.save(todo);
     }
 
@@ -62,7 +64,7 @@ public class TodoController {
             consumes = "application/json"
     )
     @CrossOrigin(origins = "http://localhost:8080")
-    public void put(@PathVariable int id, @RequestBody Todo todo) {
+    public void put(@PathVariable int id, @Valid @RequestBody Todo todo) {
         todo.id = id;
         todoRepository.save(todo);
     }

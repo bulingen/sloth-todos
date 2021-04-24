@@ -7,7 +7,6 @@ import se.meepo.slothtodos.model.Todo;
 import se.meepo.slothtodos.model.Task;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -25,16 +24,7 @@ public class TodoController {
     )
     @CrossOrigin(origins = "http://localhost:8080")
     public List<Todo> get() {
-        List<Todo> todos = new ArrayList<>();
-        for (Todo todo : todoRepository.findAll()) {
-            for (Task task : tasksRepository.findAll()) {
-                if (todo.id == task.todoId) {
-                    todo.tasks.add(task);
-                }
-            }
-            todos.add(todo);
-        }
-        return todos;
+        return todoRepository.findAll();
     }
 
     @RequestMapping(

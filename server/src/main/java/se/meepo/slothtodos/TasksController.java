@@ -3,6 +3,8 @@ package se.meepo.slothtodos;
 import org.springframework.web.bind.annotation.*;
 import se.meepo.slothtodos.model.Task;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 
@@ -40,5 +42,15 @@ public class TasksController {
     @CrossOrigin(origins = "http://localhost:8080")
     public void delete(@PathVariable int id) {
         tasksRepository.deleteById(id);
+    }
+
+    @RequestMapping(
+        value = "tasks",
+        method = RequestMethod.GET,
+        consumes = "application/json"
+    )
+    @CrossOrigin(origins = "http://localhost:8080")
+    public List<Task> getByMemberId(@RequestParam(value = "memberId", required = true) int memberId) {
+        return tasksRepository.findByMemberId(memberId);
     }
 }

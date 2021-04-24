@@ -1,11 +1,10 @@
 package se.meepo.slothtodos.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.OneToMany;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +14,8 @@ public class Todo {
     @GeneratedValue
     public int id;
     public String title, description;
-    @Transient
-    @JsonInclude
+
+    @OneToMany(mappedBy = "todoId")
     public List<Task> tasks = new ArrayList<>();
 
     public Todo() {}

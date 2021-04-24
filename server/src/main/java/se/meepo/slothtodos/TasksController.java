@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import se.meepo.slothtodos.model.Task;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
 @RestController
 public class TasksController {
@@ -17,7 +18,7 @@ public class TasksController {
             consumes = "application/json"
     )
     @CrossOrigin(origins = "http://localhost:8080")
-    public void post(@RequestBody Task task) {
+    public void post(@Valid @RequestBody Task task) {
         tasksRepository.save(task);
     }
 
@@ -27,7 +28,7 @@ public class TasksController {
             consumes = "application/json"
     )
     @CrossOrigin(origins = "http://localhost:8080")
-    public void put(@PathVariable int id, @RequestBody Task task) {
+    public void put(@PathVariable int id, @Valid @RequestBody Task task) {
         task.id = id;
         tasksRepository.save(task);
     }

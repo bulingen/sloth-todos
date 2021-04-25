@@ -77,29 +77,39 @@ export default class App extends Vue {
       });
   }
 
-  setTodo(request: string, todo: Todo) {
-    console.log(request, todo);
-    const xhr = new XMLHttpRequest();
+  async setTodo(method: string, todo: Todo) {
+    console.log(method, todo);
     const data = {
       title: todo.title,
       description: todo.description,
     };
-    const setURL = todo.id < 0 ? this.url : `${this.url}/${todo.id}`;
 
-    if (request === "DELETE") {
+    if (method === "DELETE") {
       this.currentTodo = null;
       this.saveActive = false;
       this.deleteActive = false;
     }
-    xhr.addEventListener("load", this.endload);
-    xhr.open(request, setURL);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(JSON.stringify(data));
-  }
 
-  endload() {
-    console.log("end load");
-    this.callAPI(this.url).then((data: Todo[]) => (this.listData = data));
+    const url = todo.id < 0 ? this.url : `${this.url}/${todo.id}`;
+
+    const response = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (method === "DELETE") {
+      this.listData = this.listData.filter((item) => item.id !== todo.id);
+    } else {
+      const json: Todo = await response.json();
+      const existing = this.listData.find((t) => t.id === json.id);
+      if (existing) {
+        const index = this.listData.indexOf(existing);
+        Vue.set(this.listData, index, json);
+      } else {
+        this.listData.push(json);
+      }
+    }
   }
 
   getActiveTodo(item: number) {

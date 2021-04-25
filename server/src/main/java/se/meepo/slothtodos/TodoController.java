@@ -37,10 +37,10 @@ public class TodoController {
             consumes = "application/json"
     )
     @CrossOrigin(origins = "http://localhost:8080")
-    public void post(@Valid @RequestBody Todo todo) {
+    public Todo post(@Valid @RequestBody Todo todo) {
         String robberLanguageDescription = robberLanguageService.convertToRobberLanguage(todo.getDescription());
         todo.setDescription(robberLanguageDescription);
-        todoRepository.save(todo);
+        return todoRepository.save(todo);
     }
 
     @RequestMapping(
@@ -68,9 +68,9 @@ public class TodoController {
             consumes = "application/json"
     )
     @CrossOrigin(origins = "http://localhost:8080")
-    public void put(@PathVariable int id, @Valid @RequestBody Todo todo) {
+    public Todo put(@PathVariable int id, @Valid @RequestBody Todo todo) {
         todo.id = id;
-        todoRepository.save(todo);
+        return todoRepository.save(todo);
     }
 
     @RequestMapping(

@@ -65,16 +65,20 @@ export default class App extends Vue {
   saveActive = false;
   deleteActive = false;
 
-  created() {
-    this.callAPI(this.url).then((data: Todo[]) => (this.listData = data));
+  async created() {
+    const data: Todo[] = await this.callAPI(this.url);
+    this.listData = data;
   }
 
   async callAPI(goToURL: string): Promise<Todo[]> {
-    return await fetch(goToURL, { mode: "cors" })
-      .then((resp) => resp.json())
-      .catch(function (error) {
-        console.log(error);
-      });
+    try {
+      const response = await fetch(goToURL, { mode: "cors" });
+      const json = await response.json();
+      return json;
+    } catch (error) {
+      console.log(error);
+      return Promise.reject(error);
+    }
   }
 
   async setTodo(method: string, todo: Todo) {

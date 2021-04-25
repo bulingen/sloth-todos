@@ -2,6 +2,9 @@ package se.meepo.slothtodos;
 
 import java.util.StringTokenizer;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class RobberLanguageService implements IRobberLanguageService {
 
   private static String VOWELS = "AEIOUYÅÄÖaeiouyåäö";

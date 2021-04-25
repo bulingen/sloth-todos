@@ -5,31 +5,57 @@
       <div class="logoTxt">Sloth Todos</div>
     </div>
     <div class="lowerSection">
-      <List :data="listData" v-on:activeTodo="getActiveTodo($event)" v-on:newTodo="newTodo"/>
-      <InputSection v-if="currentTodo" :item="currentTodo" v-on:update="inputSectionUpdate"/>
+      <List
+        :data="listData"
+        v-on:activeTodo="getActiveTodo($event)"
+        v-on:newTodo="newTodo"
+      />
+      <InputSection
+        v-if="currentTodo"
+        :item="currentTodo"
+        v-on:update="inputSectionUpdate"
+      />
       <div class="placeholder" v-if="!currentTodo">
         <img class="logo" src="@/assets/sloth.svg" />
         <div class="logoTxt">Sloth Todos</div>
       </div>
     </div>
-    <div :class="{'actionBtn delete': true, 'isActive': deleteActive }" @click="setTodo('DELETE', currentTodo)" title="Delete todo">
-      <svg height="24" width="24" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="#fff"/></svg>
+    <div
+      :class="{ 'actionBtn delete': true, isActive: deleteActive }"
+      @click="setTodo('DELETE', currentTodo)"
+      title="Delete todo"
+    >
+      <svg height="24" width="24" viewBox="0 0 24 24">
+        <path
+          d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+          fill="#fff"
+        />
+      </svg>
     </div>
-    <div :class="{'actionBtn save': true, 'isActive': saveActive }" @click="setTodo(currentTodo.id < 0 ? 'POST' : 'PUT', currentTodo)" title="Save todo">
-      <svg height="24" width="24" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="#fff"/></svg>
+    <div
+      :class="{ 'actionBtn save': true, isActive: saveActive }"
+      @click="setTodo(currentTodo.id < 0 ? 'POST' : 'PUT', currentTodo)"
+      title="Save todo"
+    >
+      <svg height="24" width="24" viewBox="0 0 24 24">
+        <path
+          d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"
+          fill="#fff"
+        />
+      </svg>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { Todo } from '@/utils/declarations.ts';
-import  List from '@/components/List.vue'
-import  InputSection from '@/components/Todo.vue'
+import { Component, Vue } from "vue-property-decorator";
+import { Todo } from "@/utils/declarations.ts";
+import List from "@/components/List.vue";
+import InputSection from "@/components/Todo.vue";
 @Component({
   components: {
     List,
-    InputSection
+    InputSection,
   },
 })
 export default class App extends Vue {
@@ -40,43 +66,54 @@ export default class App extends Vue {
   deleteActive = false;
 
   created() {
-    this.callAPI(this.url).then((data: Todo[]) => this.listData = data);
+    this.callAPI(this.url).then((data: Todo[]) => (this.listData = data));
   }
 
   async callAPI(goToURL: string): Promise<Todo[]> {
-    return await fetch(goToURL, {mode: 'cors'})
+    return await fetch(goToURL, { mode: "cors" })
       .then((resp) => resp.json())
-      .catch(function(error) { console.log(error); }
-    );
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 
-  setTodo(request: string, todo: Todo) {
-    console.log(request, todo);
-    const xhr = new XMLHttpRequest();
+  async setTodo(method: string, todo: Todo) {
+    console.log(method, todo);
     const data = {
-        'title': todo.title,
-        'description': todo.description,
-    }
-    const setURL = todo.id < 0 ? this.url : `${this.url}/${todo.id}`;
+      title: todo.title,
+      description: todo.description,
+    };
 
-    if(request === 'DELETE') {
+    if (method === "DELETE") {
       this.currentTodo = null;
       this.saveActive = false;
       this.deleteActive = false;
     }
-    xhr.addEventListener('load', this.endload);
-    xhr.open(request, setURL);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(JSON.stringify(data));
-  }
 
-  endload() {
-    console.log('end load');
-    this.callAPI(this.url).then((data: Todo[]) => this.listData = data);
+    const url = todo.id < 0 ? this.url : `${this.url}/${todo.id}`;
+
+    const response = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (method === "DELETE") {
+      this.listData = this.listData.filter((item) => item.id !== todo.id);
+    } else {
+      const json: Todo = await response.json();
+      const existing = this.listData.find((t) => t.id === json.id);
+      if (existing) {
+        const index = this.listData.indexOf(existing);
+        Vue.set(this.listData, index, json);
+      } else {
+        this.listData.push(json);
+      }
+    }
   }
 
   getActiveTodo(item: number) {
-    console.log('Get active');
+    console.log("Get active");
     this.currentTodo = this.listData[item];
     this.deleteActive = this.currentTodo?.id ? true : false;
   }
@@ -86,23 +123,27 @@ export default class App extends Vue {
   }
 
   newTodo() {
-    console.log('new');
+    console.log("new");
     this.currentTodo = {
-        id: -1,
-        title: "",
-        description: "",
+      id: -1,
+      title: "",
+      description: "",
     };
   }
 }
-
-
-
 </script>
 
 <style lang="scss">
-@import './scss/variables';
-body, input, textarea, button { font-family: Avenir, Helvetica, Arial, sans-serif; }
-body { margin: 0; }
+@import "./scss/variables";
+body,
+input,
+textarea,
+button {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+}
+body {
+  margin: 0;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -123,13 +164,12 @@ body { margin: 0; }
     width: 48px;
     margin-right: $m;
   }
-
 }
 .logoTxt {
   font-size: 32px;
   font-weight: 900;
   color: $action;
-  letter-spacing: -.08333rem;
+  letter-spacing: -0.08333rem;
 }
 .lowerSection {
   flex: 1;
@@ -148,7 +188,9 @@ body { margin: 0; }
 }
 .actionBtn {
   border-radius: 50%;
-  box-shadow:  0 3px 5px -1px rgba(0,0,0,.2), 0 6px 10px 0 rgba(0,0,0,.14), 0 1px 18px 0 rgba(0,0,0,.12), 0 0 2px hsla(50, 100%, 50%, 0.5) inset;
+  box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2),
+    0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12),
+    0 0 2px hsla(50, 100%, 50%, 0.5) inset;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,12 +201,16 @@ body { margin: 0; }
   font-weight: 900;
   color: #fff;
   user-select: none;
-  transition-duration: .5s;
+  transition-duration: 0.5s;
   transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
   position: fixed;
   bottom: $xl;
-  &.save { right: $xl; }
-  &.delete { right: $xl + 48px + $l; }
+  &.save {
+    right: $xl;
+  }
+  &.delete {
+    right: $xl + 48px + $l;
+  }
   &.isActive {
     transform: translateY(0);
   }

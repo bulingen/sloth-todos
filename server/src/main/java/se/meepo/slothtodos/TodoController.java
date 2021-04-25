@@ -18,6 +18,8 @@ public class TodoController {
     TodoRepository todoRepository;
     @Inject
     TaskRepository tasksRepository;
+    @Inject
+    IRobberLanguageService robberLanguageService;
 
     @RequestMapping(
             value = "todos",
@@ -36,6 +38,8 @@ public class TodoController {
     )
     @CrossOrigin(origins = "http://localhost:8080")
     public void post(@Valid @RequestBody Todo todo) {
+        String robberLanguageDescription = robberLanguageService.convertToRobberLanguage(todo.getDescription());
+        todo.setDescription(robberLanguageDescription);
         todoRepository.save(todo);
     }
 

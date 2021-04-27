@@ -20,8 +20,8 @@ public class TasksController {
             consumes = "application/json"
     )
     @CrossOrigin(origins = "http://localhost:8080")
-    public void post(@Valid @RequestBody Task task) {
-        tasksRepository.save(task);
+    public Task post(@Valid @RequestBody Task task) {
+        return tasksRepository.save(task);
     }
 
     @RequestMapping(
@@ -30,9 +30,9 @@ public class TasksController {
             consumes = "application/json"
     )
     @CrossOrigin(origins = "http://localhost:8080")
-    public void put(@PathVariable int id, @Valid @RequestBody Task task) {
+    public Task put(@PathVariable int id, @Valid @RequestBody Task task) {
         task.id = id;
-        tasksRepository.save(task);
+        return tasksRepository.save(task);
     }
 
     @RequestMapping(

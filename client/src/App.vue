@@ -14,6 +14,9 @@
         v-if="currentTodo"
         :item="currentTodo"
         v-on:update="inputSectionUpdate"
+        v-on:addTask="addTodoTask"
+        v-on:removeTask="removeTodoTask"
+        v-on:toggleTask="toggleTodoTask"
       />
       <div class="placeholder" v-if="!currentTodo">
         <img class="logo" src="@/assets/sloth.svg" />
@@ -49,7 +52,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { Todo } from "@/utils/declarations.ts";
+import { Todo, Task } from "@/utils/declarations.ts";
 import List from "@/components/List.vue";
 import InputSection from "@/components/Todo.vue";
 @Component({
@@ -133,6 +136,49 @@ export default class App extends Vue {
       title: "",
       description: "",
     };
+  }
+
+  async addTodoTask(name: string, todoId: number) {
+    const data = { name, todoId };
+    const response = await fetch("http://localhost:8088/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    const todo = this.listData.find((t) => t.id === todoId);
+    if (todo?.tasks?.push) {
+      todo?.tasks.push(json);
+    }
+  }
+
+  async removeTodoTask(taskId: number, todoId: number) {
+    await fetch(`http://localhost:8088/tasks/${taskId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    const todo = this.listData.find((t) => t.id === todoId);
+    if (todo?.tasks?.filter) {
+      todo.tasks = todo.tasks.filter((t) => t.id !== taskId);
+    }
+  }
+
+  async toggleTodoTask(task: Task, todoId: number) {
+    const data = { ...task, completed: !task.completed };
+    const response = await fetch(`http://localhost:8088/tasks/${task.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    const todo = this.listData.find((t) => t.id === todoId);
+    if (todo?.tasks?.find) {
+      const existing = todo.tasks.find((t) => t.id === task.id);
+      if (existing) {
+        const index = todo.tasks.indexOf(existing);
+        Vue.set(todo.tasks, index, json);
+      }
+    }
   }
 }
 </script>

@@ -2,47 +2,72 @@
   <div class="list">
     <div class="listToolbar">
       <div>
-        <span class="todoInfo" v-if="data.length">{{data.length}} Todos</span>
+        <span class="todoInfo" v-if="data.length">{{ data.length }} Todos</span>
       </div>
-      <svg height="24" width="24" viewBox="0 0 24 24" class="icon" title="New todo" @click="newTodo"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+      <svg
+        height="24"
+        width="24"
+        viewBox="0 0 24 24"
+        class="icon"
+        title="New todo"
+        @click="newTodo"
+      >
+        <path
+          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+        />
+      </svg>
     </div>
-    <div class="listItem" v-for="(item, index)  in data" :key="index" :class="index === activeItem ? 'isActive' : ''" @click="listItemSelect(index)">
-      <div class="title">{{item.title}}</div>
-      <div class="desc">{{item.description}}</div>
+    <div
+      class="listItem"
+      v-for="(item, index) in data"
+      :key="index"
+      :class="index === activeItem ? 'isActive' : ''"
+      @click="listItemSelect(index)"
+    >
+      <div class="title">{{ item.title }}</div>
+      <div class="desc">{{ item.description }}</div>
+      <div class="progress">
+        <TodoProgress :todo="item" />
+      </div>
     </div>
     <div class="loading" v-if="!data.length">Loading....</div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { Todo } from '@/utils/declarations.ts';
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { Todo } from "@/utils/declarations.ts";
+import TodoProgress from "@/components/TodoProgress.vue";
 
-@Component
+@Component({
+  components: {
+    TodoProgress,
+  },
+})
 export default class List extends Vue {
   @Prop() data!: Todo[];
   activeItem: number | null = null;
 
   listItemSelect(index: number) {
     this.activeItem = index;
-    this.$emit('activeTodo', index);
+    this.$emit("activeTodo", index);
   }
   newTodo() {
-    this.$emit('activeTodo', null);
-    this.$emit('newTodo');
+    this.$emit("activeTodo", null);
+    this.$emit("newTodo");
   }
 }
 </script>
 
 <style scoped lang="scss">
-@import '../scss/variables';
+@import "../scss/variables";
 
 .list {
   display: flex;
   flex-direction: column;
   flex: 1;
   max-width: 300px;
-  border-right: 1px solid transparentize($primary, .8);
+  border-right: 1px solid transparentize($primary, 0.8);
   user-select: none;
   .listToolbar {
     display: flex;
@@ -68,7 +93,7 @@ export default class List extends Vue {
       }
     }
   }
-  .loading{
+  .loading {
     margin: 0 auto;
     padding: ($s + $xs) $m;
     position: relative;
@@ -83,16 +108,17 @@ export default class List extends Vue {
       bottom: $m;
       animation: dots 1s steps(4, end) infinite;
     }
-
   }
 }
 .listItem {
   box-sizing: border-box;
-  border-bottom: 1px solid transparentize($primary, .86);
+  border-bottom: 1px solid transparentize($primary, 0.86);
   padding: ($s + $xs) $m;
-  &.isActive { background-color: transparentize($primary, .86) }
+  &.isActive {
+    background-color: transparentize($primary, 0.86);
+  }
   &:hover:not(.isActive) {
-    background-color: transparentize($primary, .96);
+    background-color: transparentize($primary, 0.96);
   }
   .title {
     font-weight: 500;
@@ -102,8 +128,8 @@ export default class List extends Vue {
     font-size: 13px;
     font-weight: 500;
     line-height: 1.3;
-     display: -webkit-box;
-     overflow: hidden;
+    display: -webkit-box;
+    overflow: hidden;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     @supports not (-webkit-line-clamp: 2) {
@@ -111,9 +137,19 @@ export default class List extends Vue {
       text-overflow: ellipsis;
     }
   }
+  .progress {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+    margin-top: 4px;
+  }
 }
 @keyframes dots {
-  from { width: 18px}
-  to { width: 0px; }
+  from {
+    width: 18px;
+  }
+  to {
+    width: 0px;
+  }
 }
 </style>
